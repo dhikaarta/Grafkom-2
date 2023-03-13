@@ -11,13 +11,72 @@
     
 
 <body>
-    <canvas id="myCanvas"></canvas>
+    <div id= "canvas-container">
+
+        <canvas id="myCanvas"  width="1000" height="1000"></canvas>
+    </div>
 
     <div id="controls">
         <h1>Controls</h1>
-        <button id="translate-btn">Translate</button>
-        <button id="shader-on-btn">Shader On</button>
-        <button id="shader-off-btn">Shader Off</button>
+        <div class="transformation_controls">
+
+            <!--  translation sliders  -->
+            <div class="slider_inputs translation_x">
+                <label for="x_value">x: </label>
+                <input type="range" class = "slider-controls" id="x-translate" value="50" />
+                <span id="x-translate-span-value">0</span>
+            </div>
+            <div class="slider_inputs translation_y">
+                <label for="y_value">y: </label>
+                <input type="range" class = "slider-controls" id="y-translate" value="50" />
+                <span id="y-translate-span-value">0</span>
+            </div>
+            <div class="slider_inputs translation_z">
+                <label for="z_value">z: </label>
+                <input type="range" class = "slider-controls" id="z-translate" value="0" min="0" max="360" />
+                <span id="z-translate-span-value">0</span>
+            </div>
+            
+            <!--  angle sliders  -->
+            <div class="slider_inputs angle_x">
+                <label for="angle_x_value">angleX: </label>
+                <input type="range" class = "slider-controls" id="angle-x" value="0" min="0" max="360" />
+                <span id="angle-x-span-value">0</span>
+            </div>
+
+            <div class="slider_inputs angle_y">
+                <label for="angle_y_value">angleY: </label>
+                <input type="range" class = "slider-controls" id="angle-y" value="0" min="0" max="360" />
+                <span id="angle-y-span-value">0</span>
+            </div>
+
+            <div class="slider_inputs angle_z">
+                <label for="angle_z_value">angleZ: </label>
+                <input type="range" class = "slider-controls" id="angle-z" value="0" min="0" max="360" />
+                <span id="angle-z-span-value">0</span>
+            </div>
+
+
+
+            <!--  scale sliders  -->
+            <div class="slider_inputs scale_x">
+                <label for="scale_x_value">scaleX: </label>
+                <input type="range" class = "slider-controls" id="scale-x" value="0" min="-5" max="5" />
+                <span id="scale-x-span-value">0</span>
+            </div>
+
+            <div class="slider_inputs scale_y">
+                <label for="scale_y_value">scaleY: </label>
+                <input type="range" class = "slider-controls" id="scale-y" value="0" min="-5" max="5" />
+                <span id="scale-y-span-value">0</span>
+            </div>
+            
+            <div class="slider_inputs scale_z">
+                <label for="scale_z_value">scaleZ: </label>
+                <input type="range" class = "slider-controls" id="scale-z" value="0" min="-5" max="5" />
+                <span id="scale-z-span-value">0</span>
+            </div>
+        </div>
     </div>
 
     
@@ -45,7 +104,8 @@
     
     
     <script src="glUtils.js"></script>
-    <script src="matUtils.js"></script>
+    <script src="mathUtils.js"></script>
+    <script src="matrixUtils.js"></script>
     <script src="main.js"></script>
 </body>
 

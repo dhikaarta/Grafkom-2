@@ -1,6 +1,6 @@
 "use strict";
 
-    function main() {
+function main() {
     // Get A WebGL context
     /** @type {HTMLCanvasElement} */
     var canvas = document.querySelector("#myCanvas");
@@ -29,43 +29,97 @@
     // Put geometry data into buffer
     setGeometry(gl);
 
-    function radToDeg(r) {
-        return (r * 180) / Math.PI;
-    }
-
-    function degToRad(d) {
-        return (d * Math.PI) / 180;
-    }
-
-    var translation = [45, 150, 0];
+    var translation = [100, 150, 0];
     var rotation = [degToRad(40), degToRad(25), degToRad(325)];
     var scale = [1, 1, 1];
     var color = [Math.random(), Math.random(), Math.random(), 1];
 
     drawScene();
-
-    function updatePosition(index) {
-        return function (event, ui) {
-        translation[index] = ui.value;
-        drawScene();
-        };
+    function updatePosition(index, value) {
+        translation[index] = value;
     }
 
-    function updateRotation(index) {
-        return function (event, ui) {
-        var angleInDegrees = ui.value;
-        var angleInRadians = (angleInDegrees * Math.PI) / 180;
+    function updateRotation(index, value) {
+      const angleInRadians = (value * Math.PI) / 180;
         rotation[index] = angleInRadians;
-        drawScene();
-        };
     }
 
-    function updateScale(index) {
-        return function (event, ui) {
-        scale[index] = ui.value;
-        drawScene();
-        };
+    function updateScale(index, value) {
+        scale[index] = value;
     }
+    // Get all the slider input elements
+    const sliders = document.querySelectorAll('.slider-controls');
+
+    const sliderMap = {
+        "x-translate": {
+            updateFunction: updatePosition,
+            parameter: 0,
+            max: gl.canvas.width,
+            value: translation[0],
+        },
+        "y-translate": {
+            updateFunction: updatePosition,
+            parameter: 1,
+            max: gl.canvas.height,
+            value: translation[1],
+        },
+        "z-translate": {
+            updateFunction: updatePosition,
+            parameter: 2,
+            max: 360,
+            value: translation[2],
+        },
+        "angle-x": {
+            updateFunction: updateRotation,
+            parameter: 0,
+            max: 360,
+            value: (rotation[0] * 180) / Math.PI,
+        },
+        "angle-y": {
+            updateFunction: updateRotation,
+            parameter: 1,
+            max: 360,
+            value: (rotation[1] * 180) / Math.PI,
+        },
+        "angle-z": {
+            updateFunction: updateRotation,
+            parameter: 2,
+            max: 360,
+            value: (rotation[2] * 180) / Math.PI,
+        },
+        "scale-x": {
+            updateFunction: updateScale,
+            parameter: 0,
+            max: 2,
+            value: scale[0],
+        },
+        "scale-y": {
+            updateFunction: updateScale,
+            parameter: 1,
+            max: 2,
+            value: scale[1],
+        },
+        "scale-z": {
+            updateFunction: updateScale,
+            parameter: 2,
+            max: 2,
+            value: scale[2],
+        },
+    };
+    
+    sliders.forEach((slider) => {
+        const { updateFunction, parameter, max, value } = sliderMap[slider.id];
+        const span = document.querySelector(`#${slider.id}-span-value`);
+        slider.max = max;
+        slider.value = value;
+        span.textContent = value;
+        slider.addEventListener("input", () => {
+            span.textContent = slider.value;
+            sliderMap[slider.id].updateFunction(parameter, slider.value);
+            drawScene();
+        });
+    });
+
 
     // Draw the scene.
     function drawScene() {
@@ -75,6 +129,8 @@
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
         // Clear the canvas.
+        gl.clearColor(0.8, 0.8, 0.8, 1.0);
+
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         // Tell it to use our program (pair of shaders)

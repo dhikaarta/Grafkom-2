@@ -1,10 +1,4 @@
-canvas {
-  width: 50%;
-  height: 100%;
-  position: absolute;
-  left: 0;
-  top: 0;
-}
+
 
 /* Set the style for the control panel on the right */
 #controls {
@@ -21,4 +15,21 @@ canvas {
 button {
   display: block;
   margin-bottom: 10px;
+}
+
+.transformation_controls {
+    width: 100%;
+    display: grid;
+    j
+}
+
+.transformation_controls label {
+  display: inline-block;
+  width: 80px; 
+  text-align: right;
+  margin-right: 10px;
+}
+
+.transformation_controls input[type=range] {
+  display: inline-block;
 }
