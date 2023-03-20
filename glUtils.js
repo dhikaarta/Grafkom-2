@@ -1,3 +1,5 @@
+// referensi : https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
+
 const defaultShaderType = ["VERTEX_SHADER", "FRAGMENT_SHADER"];
 
 function error(msg) {
