@@ -17,24 +17,31 @@ function main() {
 
     // look up where the vertex data needs to go.
     var positionLocation = gl.getAttribLocation(program, "a_position");
+    var colorLocation = gl.getAttribLocation(program, "a_color");
 
     // lookup uniforms
-    var colorLocation = gl.getUniformLocation(program, "u_color");
     var matrixLocation = gl.getUniformLocation(program, "u_matrix");
+    var modelViewMatrixLocation = gl.getUniformLocation(program, "u_modelViewMatrix");
+
 
     // Create a buffer to put positions in
     var positionBuffer = gl.createBuffer();
-    // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    // Put geometry data into buffer
     setGeometry(gl);
 
-    var translation = [100, 150, 0];
-    var rotation = [degToRad(40), degToRad(25), degToRad(325)];
+    // Create a buffer to put colors in
+    var colorBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    setColors(gl);
+
+    var translation = [0, 0, 0];
+    var rotation = [0, 0, 0];
     var scale = [1, 1, 1];
-    var color = [Math.random(), Math.random(), Math.random(), 1];
+    var fieldOfViewRadians = degToRad(45);
+    var projectionStyle = 1;
 
     drawScene();
+
     function updatePosition(index, value) {
         translation[index] = value;
     }
@@ -49,6 +56,9 @@ function main() {
     }
     // Get all the slider input elements
     const sliders = document.querySelectorAll('.slider-controls');
+    
+    // Get the select element
+    const projectionSelect = document.querySelector('#projection-select');
 
     const sliderMap = {
         "x-translate": {
@@ -90,19 +100,19 @@ function main() {
         "scale-x": {
             updateFunction: updateScale,
             parameter: 0,
-            max: 2,
+            max: 5,
             value: scale[0],
         },
         "scale-y": {
             updateFunction: updateScale,
             parameter: 1,
-            max: 2,
+            max: 5,
             value: scale[1],
         },
         "scale-z": {
             updateFunction: updateScale,
             parameter: 2,
-            max: 2,
+            max: 5,
             value: scale[2],
         },
     };
@@ -120,6 +130,18 @@ function main() {
         });
     });
 
+    projectionSelect.addEventListener('change', () => {
+        if (projectionSelect.value === 'orthographic') {
+            projectionStyle = 1;
+        } else if (projectionSelect.value === 'perspective') {
+            projectionStyle = 2;
+        } else {
+            projectionStyle = 3;
+        }
+        drawScene();
+    });
+
+
 
     // Draw the scene.
     function drawScene() {
@@ -131,7 +153,13 @@ function main() {
         // Clear the canvas.
         gl.clearColor(0.8, 0.8, 0.8, 1.0);
 
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        // Cull the backface
+        gl.enable(gl.CULL_FACE);
+
+        // Enable the depth buffer
+        gl.enable(gl.DEPTH_TEST);
 
         // Tell it to use our program (pair of shaders)
         gl.useProgram(program);
@@ -143,11 +171,11 @@ function main() {
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
         // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-        var size = 3; // 3 components per iteration
-        var type = gl.FLOAT; // the data is 32bit floats
-        var normalize = false; // don't normalize the data
-        var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-        var offset = 0; // start at the beginning of the buffer
+        var size = 3;
+        var type = gl.FLOAT; 
+        var normalize = false; 
+        var stride = 0; 
+        var offset = 0; 
         gl.vertexAttribPointer(
         positionLocation,
         size,
@@ -157,28 +185,81 @@ function main() {
         offset
         );
 
-        // set the color
-        gl.uniform4fv(colorLocation, color);
+        gl.enableVertexAttribArray(colorLocation);
 
+        // Bind the color buffer.
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+
+        // Tell the attribute how to get data out of colorBuffer (ARRAY_BUFFER)
+        var size = 3;
+        var type = gl.UNSIGNED_BYTE;
+        var normalize = true;
+        var stride = 0;
+        var offset = 0;
+        gl.vertexAttribPointer(
+        colorLocation,
+        size,
+        type,
+        normalize,
+        stride,
+        offset
+        );
+        
+       
+        
+        var projectionMatrix = m4.identity();
+
+        if (projectionStyle === 1) {
+            //ortographic
+            var left = 0;
+            var right = gl.canvas.clientWidth;
+            var bottom = gl.canvas.clientHeight;
+            var top = 0;
+            var near = 1;
+            var far = 2000.0;
+            projectionMatrix = m4.orthographic(left, right, bottom, top, near, far);
+        } else if (projectionStyle === 2) {
+            //
+            var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+            var zNear = 1;
+            var zFar = 2000.0;
+            projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
+        }
+        
+        var cameraMatrix = m4.yRotation(0 * Math.PI / 180);
+        cameraMatrix = m4.translate(cameraMatrix, 0, 0, 200 * 1.5);
+
+        var cameraPosition = [
+            cameraMatrix[12],
+            cameraMatrix[13],
+            cameraMatrix[14],
+        ];
+
+        var up = [0, 1, 0];
+        var target = [0, 0, 0];
+
+        cameraMatrix = m4.lookAt(cameraPosition, target, up);
+        
+        var viewMatrix = m4.inverse(cameraMatrix);
         // Compute the matrices
-        var matrix = m4.projection(
-        gl.canvas.clientWidth,
-        gl.canvas.clientHeight,
-        400
-        );
-        matrix = m4.translate(
-        matrix,
-        translation[0],
-        translation[1],
-        translation[2]
-        );
-        matrix = m4.xRotate(matrix, rotation[0]);
-        matrix = m4.yRotate(matrix, rotation[1]);
-        matrix = m4.zRotate(matrix, rotation[2]);
-        matrix = m4.scale(matrix, scale[0], scale[1], scale[2]);
+        
+        viewMatrix = m4.xRotate(viewMatrix, rotation[0]);
+        viewMatrix = m4.yRotate(viewMatrix, rotation[1]);
+        viewMatrix = m4.zRotate(viewMatrix, rotation[2]);
 
-        // Set the matrix.
-        gl.uniformMatrix4fv(matrixLocation, false, matrix);
+        var modelMatrix = m4.identity();
+        modelMatrix = m4.translate(
+            modelMatrix,
+            translation[0],
+            translation[1],
+            translation[2]
+        );
+        
+        modelMatrix = m4.scale(modelMatrix, scale[0], scale[1], scale[2]);
+        var modelViewMatrix = m4.multiply(viewMatrix, modelMatrix);
+
+        gl.uniformMatrix4fv(matrixLocation, false, projectionMatrix);
+        gl.uniformMatrix4fv(modelViewMatrixLocation, false, modelViewMatrix);
 
         // Draw the geometry.
         var primitiveType = gl.TRIANGLES;
@@ -186,65 +267,7 @@ function main() {
         var count = 16 * 6;
         gl.drawArrays(primitiveType, offset, count);
     }
-    }
+}
 
 
-
-    // Fill the buffer with the values that define a letter 'F'.
-    function setGeometry(gl) {
-    gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array([
-        // left column front
-        0, 0, 0, 30, 0, 0, 0, 150, 0, 0, 150, 0, 30, 0, 0, 30, 150, 0,
-
-        // top rung front
-        30, 0, 0, 100, 0, 0, 30, 30, 0, 30, 30, 0, 100, 0, 0, 100, 30, 0,
-
-        // middle rung front
-        30, 60, 0, 67, 60, 0, 30, 90, 0, 30, 90, 0, 67, 60, 0, 67, 90, 0,
-
-        // left column back
-        0, 0, 30, 30, 0, 30, 0, 150, 30, 0, 150, 30, 30, 0, 30, 30, 150, 30,
-
-        // top rung back
-        30, 0, 30, 100, 0, 30, 30, 30, 30, 30, 30, 30, 100, 0, 30, 100, 30, 30,
-
-        // middle rung back
-        30, 60, 30, 67, 60, 30, 30, 90, 30, 30, 90, 30, 67, 60, 30, 67, 90, 30,
-
-        // top
-        0, 0, 0, 100, 0, 0, 100, 0, 30, 0, 0, 0, 100, 0, 30, 0, 0, 30,
-
-        // top rung right
-        100, 0, 0, 100, 30, 0, 100, 30, 30, 100, 0, 0, 100, 30, 30, 100, 0, 30,
-
-        // under top rung
-        30, 30, 0, 30, 30, 30, 100, 30, 30, 30, 30, 0, 100, 30, 30, 100, 30, 0,
-
-        // between top rung and middle
-        30, 30, 0, 30, 30, 30, 30, 60, 30, 30, 30, 0, 30, 60, 30, 30, 60, 0,
-
-        // top of middle rung
-        30, 60, 0, 30, 60, 30, 67, 60, 30, 30, 60, 0, 67, 60, 30, 67, 60, 0,
-
-        // right of middle rung
-        67, 60, 0, 67, 60, 30, 67, 90, 30, 67, 60, 0, 67, 90, 30, 67, 90, 0,
-
-        // bottom of middle rung.
-        30, 90, 0, 30, 90, 30, 67, 90, 30, 30, 90, 0, 67, 90, 30, 67, 90, 0,
-
-        // right of bottom
-        30, 90, 0, 30, 90, 30, 30, 150, 30, 30, 90, 0, 30, 150, 30, 30, 150, 0,
-
-        // bottom
-        0, 150, 0, 0, 150, 30, 30, 150, 30, 0, 150, 0, 30, 150, 30, 30, 150, 0,
-
-        // left side
-        0, 0, 0, 0, 0, 30, 0, 150, 30, 0, 0, 0, 0, 150, 30, 0, 150, 0,
-        ]),
-        gl.STATIC_DRAW
-    );
-    }
-
-    main();
+main();
