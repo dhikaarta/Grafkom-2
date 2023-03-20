@@ -40,7 +40,7 @@ function main() {
     var radius = 200;
     var fieldOfViewRadians = degToRad(80);
     var cameraAngleRadians = degToRad(0);
-    var projectionStyle = 2;
+    var projectionStyle = 1;
 
     drawScene();
 
