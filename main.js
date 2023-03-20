@@ -34,11 +34,13 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     setColors(gl);
 
-    var translation = [0, 0, 0];
+    var translation = [-200, -200, 0];
     var rotation = [0, 0, 0];
     var scale = [1, 1, 1];
-    var fieldOfViewRadians = degToRad(45);
-    var projectionStyle = 1;
+    var radius = 200;
+    var fieldOfViewRadians = degToRad(80);
+    var cameraAngleRadians = degToRad(0);
+    var projectionStyle = 2;
 
     drawScene();
 
@@ -54,6 +56,14 @@ function main() {
     function updateScale(index, value) {
         scale[index] = value;
     }
+
+    function updateRadius(index, value) {
+        radius = value;
+    }
+
+    function updateCameraAngle(index, value) {
+        cameraAngleRadians = degToRad(value);
+    }
     // Get all the slider input elements
     const sliders = document.querySelectorAll('.slider-controls');
     
@@ -64,13 +74,14 @@ function main() {
         "x-translate": {
             updateFunction: updatePosition,
             parameter: 0,
-            max: gl.canvas.width,
+            min: -200,
+            max: 200,
             value: translation[0],
         },
         "y-translate": {
             updateFunction: updatePosition,
             parameter: 1,
-            max: gl.canvas.height,
+            max: 200,
             value: translation[1],
         },
         "z-translate": {
@@ -114,6 +125,18 @@ function main() {
             parameter: 2,
             max: 5,
             value: scale[2],
+        },
+        "camera-near": {
+            updateFunction: updateRadius,
+            parameter: 0,
+            max: 500,
+            value: radius,
+        },
+        "camera-fov": {
+            updateFunction: updateCameraAngle,
+            parameter: 0,
+            max: 360,
+            value: (cameraAngleRadians * 180) / Math.PI,
         },
     };
     
@@ -205,16 +228,15 @@ function main() {
         offset
         );
         
-       
         
         var projectionMatrix = m4.identity();
 
         if (projectionStyle === 1) {
             //ortographic
-            var left = 0;
-            var right = gl.canvas.clientWidth;
-            var bottom = gl.canvas.clientHeight;
-            var top = 0;
+            var left = -200;
+            var right = 200;
+            var bottom = 200;
+            var top = -200;
             var near = 1;
             var far = 2000.0;
             projectionMatrix = m4.orthographic(left, right, bottom, top, near, far);
@@ -223,11 +245,12 @@ function main() {
             var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
             var zNear = 1;
             var zFar = 2000.0;
+            
             projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
         }
         
-        var cameraMatrix = m4.yRotation(0 * Math.PI / 180);
-        cameraMatrix = m4.translate(cameraMatrix, 0, 0, 200 * 1.5);
+        var cameraMatrix = m4.yRotation(cameraAngleRadians);
+        cameraMatrix = m4.translate(cameraMatrix, 0, 0, radius * 1.5);
 
         var cameraPosition = [
             cameraMatrix[12],

@@ -23,12 +23,12 @@
             <!--  translation sliders  -->
             <div class="slider_inputs translation_x">
                 <label for="x_value">x: </label>
-                <input type="range" class = "slider-controls" id="x-translate" value="50" />
+                <input type="range" class = "slider-controls" min= "-200" id="x-translate" value="50" />
                 <span id="x-translate-span-value">0</span>
             </div>
             <div class="slider_inputs translation_y">
                 <label for="y_value">y: </label>
-                <input type="range" class = "slider-controls" id="y-translate" value="50" />
+                <input type="range" class = "slider-controls" min= "-200" id="y-translate" value="50" />
                 <span id="y-translate-span-value">0</span>
             </div>
             <div class="slider_inputs translation_z">
@@ -79,7 +79,16 @@
         </div>
 
         <div>
-
+            <div>
+                <label for = "camera FOV">Camera FOV:</label>
+                <input type="range" class = "slider-controls" id="camera-fov" value="0" min="0" max="360" />
+                <span id="camera-fov-span-value">0</span>
+            </div>
+            <div>
+                <label for = "camera near">Camera Near:</label>
+                <input type="range" class = "slider-controls" id="camera-near" value="0" min="0" max="360" />
+                <span id="camera-near-span-value">0</span>
+            </div>
         </div>
 
         <div>
