@@ -18,11 +18,13 @@ function main() {
     // look up where the vertex data needs to go.
     var positionLocation = gl.getAttribLocation(program, "a_position");
     var colorLocation = gl.getAttribLocation(program, "a_color");
+    var normalLocation = gl.getAttribLocation(program, "a_normal")
 
     // lookup uniforms
     var matrixLocation = gl.getUniformLocation(program, "u_matrix");
     var modelViewMatrixLocation = gl.getUniformLocation(program, "u_modelViewMatrix");
-
+    var uniformNormalMatrix = gl.getUniformLocation(program, "u_normal_matrix");
+    var shadingConditionLocation = gl.getUniformLocation(program, "u_shading_condition");
 
     // Create a buffer to put positions in
     var positionBuffer = gl.createBuffer();
@@ -32,7 +34,12 @@ function main() {
     // Create a buffer to put colors in
     var colorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    setColors(gl);
+    setColor(gl);
+
+    // Create a buffer for normalization
+    var normalBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    setNormal(gl)
 
     var translation = [-200, -200, 0];
     var rotation = [0, 0, 0];
@@ -41,6 +48,7 @@ function main() {
     var fieldOfViewRadians = degToRad(80);
     var cameraAngleRadians = degToRad(0);
     var projectionStyle = 1;
+    var shading = false;
 
     drawScene();
 
@@ -69,6 +77,22 @@ function main() {
     
     // Get the select element
     const projectionSelect = document.querySelector('#projection-select');
+
+    // Get shading button
+    const toggleShading = document.getElementById('shading')
+
+    toggleShading.addEventListener('click', () => {
+        if (shading === false) {
+            shading = true
+            toggleShading.innerText = 'Shading On'
+            gl.uniform1f(shadingConditionLocation, 1.0);
+        } else {
+            shading = false
+            toggleShading.innerText = 'Shading Off'
+            gl.uniform1f(shadingConditionLocation, 0.0);
+        }
+        drawScene()
+    })
 
     const sliderMap = {
         "x-translate": {
@@ -164,6 +188,14 @@ function main() {
         drawScene();
     });
 
+    if (projectionStyle === 1) {
+        projectionSelect.value = 'orthographic'
+    } else if (projectionStyle === 2) {
+        projectionSelect.value = 'perspective'
+    } else {
+        projectionSelect.value = 'oblique'
+    }
+
 
 
     // Draw the scene.
@@ -187,6 +219,7 @@ function main() {
         // Tell it to use our program (pair of shaders)
         gl.useProgram(program);
 
+        // POSITION
         // Turn on the attribute
         gl.enableVertexAttribArray(positionLocation);
 
@@ -200,14 +233,15 @@ function main() {
         var stride = 0; 
         var offset = 0; 
         gl.vertexAttribPointer(
-        positionLocation,
-        size,
-        type,
-        normalize,
-        stride,
-        offset
+            positionLocation,
+            size,
+            type,
+            normalize,
+            stride,
+            offset
         );
-
+        
+        // COLORS
         gl.enableVertexAttribArray(colorLocation);
 
         // Bind the color buffer.
@@ -220,13 +254,45 @@ function main() {
         var stride = 0;
         var offset = 0;
         gl.vertexAttribPointer(
-        colorLocation,
-        size,
-        type,
-        normalize,
-        stride,
-        offset
+            colorLocation,
+            size,
+            type,
+            normalize,
+            stride,
+            offset
         );
+
+        if (shading) {
+            // NORMALS
+            gl.enableVertexAttribArray(normalLocation);
+
+            // Bind the position buffer.
+            gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+
+            // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+            var size = 3;
+            var type = gl.FLOAT; 
+            var normalize = false; 
+            var stride = 0; 
+            var offset = 0; 
+            gl.vertexAttribPointer(
+                normalLocation,
+                size,
+                type,
+                normalize,
+                stride,
+                offset
+            );
+            
+            var normalMatrix = m4.identity()
+            normalMatrix = m4.xRotate(normalMatrix, rotation[0]);
+            normalMatrix = m4.yRotate(normalMatrix, rotation[1]);
+            normalMatrix = m4.zRotate(normalMatrix, rotation[2]);
+
+            gl.uniformMatrix4fv(uniformNormalMatrix, false, normalMatrix);
+        } else {
+            gl.disableVertexAttribArray(normalLocation)
+        }
         
         
         var projectionMatrix = m4.identity();
