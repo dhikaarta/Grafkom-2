@@ -34,35 +34,39 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     setColors(gl);
 
-    var translation = [-200, -200, 0];
-    var rotation = [0, 0, 0];
-    var scale = [1, 1, 1];
-    var radius = 200;
-    var fieldOfViewRadians = degToRad(80);
-    var cameraAngleRadians = degToRad(0);
-    var projectionStyle = 1;
+    // var translation = [-200, -200, 0];
+    // var rotation = [0, 0, 0];
+    // var scale = [1, 1, 1];
+    // var radius = 200;
+    // var fieldOfViewRadians = degToRad(80);
+    // var cameraAngleRadians = degToRad(0);
+    // var projectionStyle = 1;
+
+    // init setup canvasState
+    var canvasState;
+    reset_canvas();
 
     drawScene();
 
     function updatePosition(index, value) {
-        translation[index] = value;
+        canvasState.translation[index] = value;
     }
 
     function updateRotation(index, value) {
       const angleInRadians = (value * Math.PI) / 180;
-        rotation[index] = angleInRadians;
+        canvasState.rotation[index] = angleInRadians;
     }
 
     function updateScale(index, value) {
-        scale[index] = value;
+        canvasState.scale[index] = value;
     }
 
     function updateRadius(index, value) {
-        radius = value;
+        canvasState.radius = value;
     }
 
     function updateCameraAngle(index, value) {
-        cameraAngleRadians = degToRad(value);
+        canvasState.cameraAngleRadians = degToRad(value);
     }
     // Get all the slider input elements
     const sliders = document.querySelectorAll('.slider-controls');
@@ -76,90 +80,93 @@ function main() {
             parameter: 0,
             min: -200,
             max: 200,
-            value: translation[0],
+            value: canvasState.translation[0],
         },
         "y-translate": {
             updateFunction: updatePosition,
             parameter: 1,
             max: 200,
-            value: translation[1],
+            value: canvasState.translation[1],
         },
         "z-translate": {
             updateFunction: updatePosition,
             parameter: 2,
             max: 360,
-            value: translation[2],
+            value: canvasState.translation[2],
         },
         "angle-x": {
             updateFunction: updateRotation,
             parameter: 0,
             max: 360,
-            value: (rotation[0] * 180) / Math.PI,
+            value: (canvasState.rotation[0] * 180) / Math.PI,
         },
         "angle-y": {
             updateFunction: updateRotation,
             parameter: 1,
             max: 360,
-            value: (rotation[1] * 180) / Math.PI,
+            value: (canvasState.rotation[1] * 180) / Math.PI,
         },
         "angle-z": {
             updateFunction: updateRotation,
             parameter: 2,
             max: 360,
-            value: (rotation[2] * 180) / Math.PI,
+            value: (canvasState.rotation[2] * 180) / Math.PI,
         },
         "scale-x": {
             updateFunction: updateScale,
             parameter: 0,
             max: 5,
-            value: scale[0],
+            value: canvasState.scale[0],
         },
         "scale-y": {
             updateFunction: updateScale,
             parameter: 1,
             max: 5,
-            value: scale[1],
+            value: canvasState.scale[1],
         },
         "scale-z": {
             updateFunction: updateScale,
             parameter: 2,
             max: 5,
-            value: scale[2],
+            value: canvasState.scale[2],
         },
         "camera-near": {
             updateFunction: updateRadius,
             parameter: 0,
             max: 500,
-            value: radius,
+            value: canvasState.radius,
         },
         "camera-fov": {
             updateFunction: updateCameraAngle,
             parameter: 0,
             max: 360,
-            value: (cameraAngleRadians * 180) / Math.PI,
+            value: (canvasState.cameraAngleRadians * 180) / Math.PI,
         },
     };
     
-    sliders.forEach((slider) => {
-        const { updateFunction, parameter, max, value } = sliderMap[slider.id];
-        const span = document.querySelector(`#${slider.id}-span-value`);
-        slider.max = max;
-        slider.value = value;
-        span.textContent = value;
-        slider.addEventListener("input", () => {
-            span.textContent = slider.value;
-            sliderMap[slider.id].updateFunction(parameter, slider.value);
-            drawScene();
+    function reset_sliders() {
+        sliders.forEach((slider) => {
+            const { updateFunction, parameter, max, value } = sliderMap[slider.id];
+            const span = document.querySelector(`#${slider.id}-span-value`);
+            slider.max = max;
+            slider.value = value;
+            span.textContent = value;
+            slider.addEventListener("input", () => {
+                span.textContent = slider.value;
+                sliderMap[slider.id].updateFunction(parameter, slider.value);
+                drawScene();
+            });
         });
-    });
+    }
+    reset_sliders();
 
     projectionSelect.addEventListener('change', () => {
         if (projectionSelect.value === 'orthographic') {
-            projectionStyle = 1;
+            canvasState.projectionStyle = 1;
         } else if (projectionSelect.value === 'perspective') {
-            projectionStyle = 2;
+            canvasState.projectionStyle = 2;
         } else {
-            projectionStyle = 3;
+            canvasState.projectionStyle = 3;
         }
         drawScene();
     });
@@ -231,7 +238,7 @@ function main() {
         
         var projectionMatrix = m4.identity();
 
-        if (projectionStyle === 1) {
+        if (canvasState.projectionStyle === 1) {
             //ortographic
             var left = -200;
             var right = 200;
@@ -240,17 +247,17 @@ function main() {
             var near = 1;
             var far = 2000.0;
             projectionMatrix = m4.orthographic(left, right, bottom, top, near, far);
-        } else if (projectionStyle === 2) {
+        } else if (canvasState.projectionStyle === 2) {
             //
             var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
             var zNear = 1;
             var zFar = 2000.0;
             
-            projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
+            projectionMatrix = m4.perspective(canvasState.fieldOfViewRadians, aspect, zNear, zFar);
         }
         
-        var cameraMatrix = m4.yRotation(cameraAngleRadians);
-        cameraMatrix = m4.translate(cameraMatrix, 0, 0, radius * 1.5);
+        var cameraMatrix = m4.yRotation(canvasState.cameraAngleRadians);
+        cameraMatrix = m4.translate(cameraMatrix, 0, 0, canvasState.radius * 1.5);
 
         var cameraPosition = [
             cameraMatrix[12],
@@ -266,19 +273,19 @@ function main() {
         var viewMatrix = m4.inverse(cameraMatrix);
         // Compute the matrices
         
-        viewMatrix = m4.xRotate(viewMatrix, rotation[0]);
-        viewMatrix = m4.yRotate(viewMatrix, rotation[1]);
-        viewMatrix = m4.zRotate(viewMatrix, rotation[2]);
+        viewMatrix = m4.xRotate(viewMatrix, canvasState.rotation[0]);
+        viewMatrix = m4.yRotate(viewMatrix, canvasState.rotation[1]);
+        viewMatrix = m4.zRotate(viewMatrix, canvasState.rotation[2]);
 
         var modelMatrix = m4.identity();
         modelMatrix = m4.translate(
             modelMatrix,
-            translation[0],
-            translation[1],
-            translation[2]
+            canvasState.translation[0],
+            canvasState.translation[1],
+            canvasState.translation[2]
         );
         
-        modelMatrix = m4.scale(modelMatrix, scale[0], scale[1], scale[2]);
+        modelMatrix = m4.scale(modelMatrix, canvasState.scale[0], canvasState.scale[1], canvasState.scale[2]);
         var modelViewMatrix = m4.multiply(viewMatrix, modelMatrix);
 
         gl.uniformMatrix4fv(matrixLocation, false, projectionMatrix);
@@ -292,18 +299,41 @@ function main() {
     }
 
     // reset view model button operation
+    function reset_canvas(projectionStyle = 1) {
+        canvasState = {
+            model: {
+                geometry: [],
+                colors: [],
+            },
+            translation         : [-200, -200, 0],
+            rotation            : [0, 0, 0],
+            scale               : [1, 1, 1],
+            radius              : 200,
+            fieldOfViewRadians  : degToRad(80),
+            cameraAngleRadians  : degToRad(0),
+            projectionStyle     : projectionStyle,
+        };
+    }
     var reset_view_btn = document.querySelector('#reset_view_btn');
     reset_view_btn.addEventListener('click', () => {
         console.log("RESET VIEW MODEL");
+        console.log("--before");
 
+        console.log(canvasState);
+        reset_canvas(canvasState.projectionStyle);
+        reset_sliders();
+        drawScene();
+        
+        console.log("--after");
+        console.log(canvasState);
     });
-    // save file model
+    // save file model operation
     var save_btn = document.querySelector('#save_btn');
     save_btn.addEventListener('click', () => {
         console.log("SAVE FILE MODEL");
 
     });
-    // load file model
+    // load file model operation
     var load_btn = document.querySelector('#load_btn');
     load_btn.addEventListener('click', () => {
         console.log("LOAD FILE MODEL");
