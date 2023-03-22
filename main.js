@@ -290,7 +290,25 @@ function main() {
         var count = 16 * 6;
         gl.drawArrays(primitiveType, offset, count);
     }
-}
 
+    // reset view model button operation
+    var reset_view_btn = document.querySelector('#reset_view_btn');
+    reset_view_btn.addEventListener('click', () => {
+        console.log("RESET VIEW MODEL");
+
+    });
+    // save file model
+    var save_btn = document.querySelector('#save_btn');
+    save_btn.addEventListener('click', () => {
+        console.log("SAVE FILE MODEL");
+
+    });
+    // load file model
+    var load_btn = document.querySelector('#load_btn');
+    load_btn.addEventListener('click', () => {
+        console.log("LOAD FILE MODEL");
+
+    });
+}
 
 main();
