@@ -2,7 +2,7 @@
 
 /* Set the style for the control panel on the right */
 #controls {
-  width: 50%;
+  width: 30%;
   height: 100%;
   position: absolute;
   right: 0;
@@ -31,4 +31,14 @@ button {
 
 .transformation_controls input[type=range] {
   display: inline-block;
+}
+
+.shading-button {
+  margin-top: 5px;
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  cursor: pointer;
 }

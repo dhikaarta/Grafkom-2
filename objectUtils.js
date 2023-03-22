@@ -1,4 +1,4 @@
-   // Fill the buffer with the values that define a letter 'F'.
+// Fill the buffer with the values that define a letter 'F'.
 function setGeometry(gl) {
   gl.bufferData(
       gl.ARRAY_BUFFER,
@@ -133,7 +133,7 @@ function setGeometry(gl) {
       gl.STATIC_DRAW);
 }
 // Fill the buffer with colors for the 'F'.
-function setColors(gl) {
+function setColor(gl) {
   gl.bufferData(
       gl.ARRAY_BUFFER,
       new Uint8Array([
@@ -265,4 +265,160 @@ function setColors(gl) {
         160, 160, 220,
         160, 160, 220]),
         gl.STATIC_DRAW);
+}
+
+function setNormal(gl) {
+  var normals = new Float32Array([
+          // left column front
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+
+          // top rung front
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+
+          // middle rung front
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+          0, 0, 1,
+
+          // left column back
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+
+          // top rung back
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+
+          // middle rung back
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+          0, 0, -1,
+
+          // top
+          0, 1, 0,
+          0, 1, 0,
+          0, 1, 0,
+          0, 1, 0,
+          0, 1, 0,
+          0, 1, 0,
+
+          // top rung right
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+
+          // under top rung
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+
+          // between top rung and middle
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+
+          // top of middle rung
+          0, 1, 0,
+          0, 1, 0,
+          0, 1, 0,
+          0, 1, 0,
+          0, 1, 0,
+          0, 1, 0,
+
+          // right of middle rung
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+
+          // bottom of middle rung.
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+
+          // right of bottom
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+          1, 0, 0,
+
+          // bottom
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+          0, -1, 0,
+
+          // left side
+          -1, 0, 0,
+          -1, 0, 0,
+          -1, 0, 0,
+          -1, 0, 0,
+          -1, 0, 0,
+          -1, 0, 0]);
+  gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
+}
+
+function setVertices(gl, vertices) {
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array(vertices),
+    gl.STATIC_DRAW
+  )
+}
+
+function setNormals(gl, normals) {
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array(normals),
+    gl.STATIC_DRAW
+  )
+}
+
+function setColors(gl, colors) {
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Uint8Array(colors),
+    gl.STATIC_DRAW
+  )
 }
