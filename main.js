@@ -26,15 +26,25 @@ function main() {
     var uniformNormalMatrix = gl.getUniformLocation(program, "u_normal_matrix");
     var shadingConditionLocation = gl.getUniformLocation(program, "u_shading_condition");
 
+    // init canvas state
+    var canvasState;
+    reset_canvas();
+    
     // Create a buffer to put positions in
     var positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    setGeometry(gl);
+    // setGeometry(gl);
+    if(canvasState) {
+        setVertices(gl, canvasState.model.vertices);
+    }
 
     // Create a buffer to put colors in
     var colorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    setColor(gl);
+    // setColor(gl);
+    if(canvasState) {
+        setColors(gl, canvasState.model.colors);
+    }
 
     // Create a buffer for normalization
     var normalBuffer = gl.createBuffer();
@@ -49,9 +59,6 @@ function main() {
     // var cameraAngleRadians = degToRad(0);
     // var projectionStyle = 1;
     // var shading = false;
-    // init setup canvasState
-    var canvasState;
-    reset_canvas();
 
     drawScene();
 
@@ -363,12 +370,51 @@ function main() {
         gl.drawArrays(primitiveType, offset, count);
     }
 
+    // OBJECT CHOICES
+    var obj_1 = document.querySelector('#obj_1');
+    obj_1.addEventListener('click', () => {
+        console.log("SWITCHED TO OBJ_1");
+        canvasState.model.vertices = F_obj.vertices;
+        canvasState.model.colors = F_obj.colors;
+        // reset_canvas(F_obj, canvasState.projectionStyle);
+        // update the vertices data
+        positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        setVertices(gl, canvasState.model.vertices);
+        // update the colors data
+        colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        setColors(gl, canvasState.model.colors);
+        drawScene();
+    });
+    var obj_2 = document.querySelector('#obj_2');
+    obj_2.addEventListener('click', () => {
+        console.log("SWITCHED TO OBJ_2");
+        canvasState.model.vertices = dump_obj.vertices;
+        canvasState.model.colors = dump_obj.colors;
+        // reset_canvas(dump_obj, canvasState.projectionStyle);
+        // update the vertices data
+        positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        setVertices(gl, canvasState.model.vertices);
+        // update the colors data
+        colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        setColors(gl, canvasState.model.colors);
+        drawScene();
+    });
+    var obj_3 = document.querySelector('#obj_3');
+    obj_3.addEventListener('click', () => {
+        console.log("SWITCHED TO OBJ_3");
+        drawScene();
+    });
+
     // reset view model button operation
-    function reset_canvas(projectionStyle = 1) {
+    function reset_canvas(object = F_obj, projectionStyle = 1) {
         canvasState = {
             model: {
-                geometry: [],
-                colors: [],
+                vertices: object.vertices,
+                colors: object.colors,
             },
             translation         : [-200, -200, 0],
             rotation            : [0, 0, 0],
@@ -384,9 +430,9 @@ function main() {
     reset_view_btn.addEventListener('click', () => {
         console.log("RESET VIEW MODEL");
         console.log("--before");
-
         console.log(canvasState);
-        reset_canvas(canvasState.projectionStyle);
+
+        reset_canvas(canvasState.model, canvasState.projectionStyle);
         reset_sliders();
         toggleShading.innerText = 'Shading Off'
         gl.uniform1f(shadingConditionLocation, 0.0);

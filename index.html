@@ -18,8 +18,15 @@
 
     <div id="controls">
         <h1>Controls</h1>
+        <div class="switch_object">
+            <div style="display:flex; margin-top: 5px; margin-bottom: 5px;">
+                <button style="margin-right: 8px;" id="obj_1">Object 1</button>
+                <button id="obj_2">Object 2</button>
+                <button style="margin-left: 8px;" id="obj_3">Object 3</button>
+            </div>
+        </div>
         <div class="transformation_controls">
-
+            
             <!--  translation sliders  -->
             <div class="slider_inputs translation_x">
                 <label for="x_value">x: </label>
@@ -168,7 +175,9 @@
         }
     </script>
     
-    <script src="objects/hollow_cube.js"></script>
+    <!-- <script src="objects/hollow_cube.js"></script> -->
+    <script src="objects/F_obj.js"></script>
+    <script src="objects/dump_obj.js"></script>
     <script src="glUtils.js"></script>
     <script src="objectUtils.js"></script>
     <script src="mathUtils.js"></script>
