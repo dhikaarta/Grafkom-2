@@ -71,6 +71,31 @@
     ];
     },
 
+    transpose: function (m) {
+        return [
+        m[0], m[4], m[8], m[12],
+        m[1], m[5], m[9], m[13],
+        m[2], m[6], m[10], m[14],
+        m[3], m[7], m[11], m[15],
+        ];
+    },
+
+    shear : function (theta,phi) {
+        radTheta = degToRad(theta);
+        radPhi = degToRad(phi);
+        var cotT = 1/Math.tan(radTheta);
+        var cotP = 1/Math.tan(radPhi);
+        var matrix = [
+        1, 0, 0, 0, 
+        0, 1, 0, 0,
+        cotT, cotP, 1, 0,
+        0, 0, 0, 1
+        ];
+        
+        return matrix;
+    },
+
+
 
     multiply: function (a, b) {
         var a00 = a[0 * 4 + 0];
@@ -133,21 +158,30 @@
         var c = Math.cos(angleInRadians);
         var s = Math.sin(angleInRadians);
 
-        return [1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1];
+        return [1, 0, 0, 0, 
+                0, c, s, 0, 
+                0, -s, c, 0, 
+                0, 0, 0, 1];
     },
 
     yRotation: function (angleInRadians) {
         var c = Math.cos(angleInRadians);
         var s = Math.sin(angleInRadians);
 
-        return [c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1];
+        return [c, 0, -s, 0, 
+                0, 1, 0, 0, 
+                s, 0, c, 0, 
+                0, 0, 0, 1];
     },
 
     zRotation: function (angleInRadians) {
         var c = Math.cos(angleInRadians);
         var s = Math.sin(angleInRadians);
 
-        return [c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+        return [c, s, 0, 0, 
+                -s, c, 0, 0, 
+                0, 0, 1, 0, 
+                0, 0, 0, 1];
     },
 
     scaling: function (sx, sy, sz) {
