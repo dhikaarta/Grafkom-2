@@ -83,13 +83,15 @@
     shear : function (theta,phi) {
         radTheta = degToRad(theta);
         radPhi = degToRad(phi);
-
+        var cotT = 1/Math.tan(radTheta);
+        var cotP = 1/Math.tan(radPhi);
         var matrix = [
         1, 0, 0, 0, 
         0, 1, 0, 0,
-        Math.cos(radTheta)/2, Math.cos(radPhi)/2, 1, 0,
+        cotT, cotP, 1, 0,
         0, 0, 0, 1
         ];
+        
         return matrix;
     },
 

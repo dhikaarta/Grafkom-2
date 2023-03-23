@@ -326,7 +326,7 @@ function main() {
             var n = m4.shear(64 ,64)
             var m = m4.orthographic(-200, 200, -200, 200, -400, 400)
             projectionMatrix = m4.multiply(m,n)
-            projectionMatrix = m4.translate(projectionMatrix, 50, -155, 0.5)
+            projectionMatrix = m4.translate(projectionMatrix, -200, 0, 0.5)
             projectionMatrix = m4.xRotate(projectionMatrix, degToRad(180))
         }
         console.log(projectionMatrix)
@@ -380,7 +380,7 @@ function main() {
                 geometry: [],
                 colors: [],
             },
-            translation         : [-200, -200, 0],
+            translation         : [0, 0, 0],
             rotation            : [0, 0, 0],
             scale               : [1, 1, 1],
             radius              : 200,
