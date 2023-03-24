@@ -376,7 +376,7 @@ function main() {
         // Draw the geometry.
         var primitiveType = gl.TRIANGLES;
         var offset = 0;
-        var count = 16 * 6;
+        var count = canvasState.model.vertices.length;
         gl.drawArrays(primitiveType, offset, count);
     }
 
@@ -400,9 +400,9 @@ function main() {
     var obj_2 = document.querySelector('#obj_2');
     obj_2.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_2");
-        canvasState.model.vertices = dump_obj.vertices;
-        canvasState.model.colors = dump_obj.colors;
-        // reset_canvas(dump_obj, canvasState.projectionStyle);
+        canvasState.model.vertices = hollowObject.vertices;
+        canvasState.model.colors = hollowObject.colors;
+        // reset_canvas(hollowObject, canvasState.projectionStyle);
         // update the vertices data
         positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -416,6 +416,17 @@ function main() {
     var obj_3 = document.querySelector('#obj_3');
     obj_3.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_3");
+        canvasState.model.vertices = cylindric_obj.vertices;
+        canvasState.model.colors = cylindric_obj.colors;
+        // reset_canvas(cylindric_obj, canvasState.projectionStyle);
+        // update the vertices data
+        positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        setVertices(gl, canvasState.model.vertices);
+        // update the colors data
+        colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        setColors(gl, canvasState.model.colors);
         drawScene();
     });
 
@@ -455,14 +466,13 @@ function main() {
     var save_btn = document.querySelector('#save_btn');
     save_btn.addEventListener('click', () => {
         console.log("SAVE FILE MODEL");
-
+        save_state(canvasState);
     });
     // load file model operation
     var load_btn = document.querySelector('#load_btn');
-    load_btn.addEventListener('click', () => {
+    load_btn.onchange = () => {
         console.log("LOAD FILE MODEL");
-
-    });
+    };
 }
 
 main();
