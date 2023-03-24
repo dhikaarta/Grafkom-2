@@ -57,6 +57,23 @@ function main() {
         setNormals(gl, canvasState.model.normals);
     }
 
+    // function to update canvas object (rewrite buffer data)
+    function updateCanvasObject() {
+        // update the vertices data
+        positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        setVertices(gl, canvasState.model.vertices);
+        // update the colors data
+        colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        setColors(gl, canvasState.model.colors);
+        // update the normals data
+        var normalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+        setNormals(gl, canvasState.model.normals);
+        drawScene();
+    };
+
     // var translation = [-200, -200, 0];
     // var rotation = [0, 0, 0];
     // var scale = [1, 1, 1];
@@ -401,20 +418,7 @@ function main() {
         canvasState.model.colors = F_obj.colors;
         canvasState.model.normals = F_obj.normals;
         // reset_canvas(F_obj, canvasState.projectionStyle);
-        // update the vertices data
-        positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        setVertices(gl, canvasState.model.vertices);
-        // update the colors data
-        colorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        setColors(gl, canvasState.model.colors);
-        // update the normals data
-        var normalBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-        setNormals(gl, canvasState.model.normals);
-
-        drawScene();
+        updateCanvasObject();
     });
     var obj_2 = document.querySelector('#obj_2');
     obj_2.addEventListener('click', () => {
@@ -422,36 +426,15 @@ function main() {
         canvasState.model.vertices = hollowObject.vertices;
         canvasState.model.colors = hollowObject.colors;
         // reset_canvas(hollowObject, canvasState.projectionStyle);
-        // update the vertices data
-        positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        setVertices(gl, canvasState.model.vertices);
-        // update the colors data
-        colorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        setColors(gl, canvasState.model.colors);
-        // update the normals data
-        var normalBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-        setNormals(gl, canvasState.model.normals);
-        
-        drawScene();
+        updateCanvasObject();
     });
     var obj_3 = document.querySelector('#obj_3');
     obj_3.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_3");
-        canvasState.model.vertices = cylindric_obj.vertices;
-        canvasState.model.colors = cylindric_obj.colors;
-        // reset_canvas(cylindric_obj, canvasState.projectionStyle);
-        // update the vertices data
-        positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        setVertices(gl, canvasState.model.vertices);
-        // update the colors data
-        colorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        setColors(gl, canvasState.model.colors);
-        drawScene();
+        canvasState.model.vertices = hollowObject.vertices;
+        canvasState.model.colors = hollowObject.colors;
+        // reset_canvas(hollowObject, canvasState.projectionStyle);
+        updateCanvasObject();
     });
 
     // reset view model button operation
@@ -497,7 +480,16 @@ function main() {
     var load_btn = document.querySelector('#load_btn');
     load_btn.onchange = () => {
         console.log("LOAD FILE MODEL");
-
+        const file_input = load_btn.files[0];
+        load_state(file_input)
+            .then(result => {
+                const loaded_state = JSON.parse(result);
+                canvasState = loaded_state;
+                updateCanvasObject();
+            })
+            .catch(error => {
+                console.log(error);
+            });
     };
 
     var then = 0

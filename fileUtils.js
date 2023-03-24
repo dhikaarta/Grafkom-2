@@ -11,3 +11,16 @@ const save_state = (state_variable) => {
     link.click();
     URL.revokeObjectURL(url);
 };
+
+const load_state = (file_input) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsText(file_input);
+        reader.onload = () => {
+          resolve(reader.result);
+        };
+        reader.onerror = () => {
+          reject(reader.error);
+        };
+    });
+};
