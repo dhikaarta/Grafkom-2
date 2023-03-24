@@ -69,9 +69,10 @@ function main() {
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         setColors(gl, canvasState.model.colors);
         // update the normals data
-        var normalBuffer = gl.createBuffer();
+        normalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
         setNormals(gl, canvasState.model.normals);
+        console.log(canvasState.model.normals);
         drawScene();
     };
 
@@ -364,7 +365,7 @@ function main() {
         );
         
         modelMatrix = m4.scale(modelMatrix, canvasState.scale[0], canvasState.scale[1], canvasState.scale[2]);
-        var modelViewMatrix = m4.multiply(viewMatrix, modelMatrix);
+        var modelViewMatrix = m4.multiply(modelMatrix, viewMatrix);
         modelViewMatrix = m4.translate(modelViewMatrix, centerPoint[0], centerPoint[1], centerPoint[2])
         modelViewMatrix = m4.xRotate(modelViewMatrix, cubeRotation * 0.3)
         modelViewMatrix = m4.yRotate(modelViewMatrix, cubeRotation * 0.7)
@@ -426,14 +427,16 @@ function main() {
         console.log("SWITCHED TO OBJ_2");
         canvasState.model.vertices = hollowObject.vertices;
         canvasState.model.colors = hollowObject.colors;
+        canvasState.model.normals = hollowObject.normals;
+        
         // reset_canvas(hollowObject, canvasState.projectionStyle);
         updateCanvasObject();
     });
     var obj_3 = document.querySelector('#obj_3');
     obj_3.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_3");
-        canvasState.model.vertices = hollowObject.vertices;
-        canvasState.model.colors = hollowObject.colors;
+        canvasState.model.vertices = hollowPrism.vertices;
+        canvasState.model.colors = hollowPrism.colors;
         // reset_canvas(hollowObject, canvasState.projectionStyle);
         updateCanvasObject();
     });
