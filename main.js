@@ -15,6 +15,10 @@ function main() {
         "fragment-shader-3d",
     ]);
 
+    // animation
+    var cubeRotation = 0.0;
+    var deltaTime = 0
+
     // look up where the vertex data needs to go.
     var positionLocation = gl.getAttribLocation(program, "a_position");
     var colorLocation = gl.getAttribLocation(program, "a_color");
@@ -49,7 +53,9 @@ function main() {
     // Create a buffer for normalization
     var normalBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-    setNormal(gl)
+    if(canvasState) {
+        setNormals(gl, canvasState.model.normals);
+    }
 
     // var translation = [-200, -200, 0];
     // var rotation = [0, 0, 0];
@@ -59,6 +65,8 @@ function main() {
     // var cameraAngleRadians = degToRad(0);
     // var projectionStyle = 1;
     // var shading = false;
+
+    // Get the center point of the cube
 
     drawScene();
 
@@ -274,39 +282,8 @@ function main() {
             stride,
             offset
         );
-
-        if (canvasState.shading) {
-            // NORMALS
-            gl.enableVertexAttribArray(normalLocation);
-
-            // Bind the position buffer.
-            gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-
-            // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-            var size = 3;
-            var type = gl.FLOAT; 
-            var normalize = false; 
-            var stride = 0; 
-            var offset = 0; 
-            gl.vertexAttribPointer(
-                normalLocation,
-                size,
-                type,
-                normalize,
-                stride,
-                offset
-            );
-            
-            var normalMatrix = m4.identity()
-            normalMatrix = m4.xRotate(normalMatrix, canvasState.rotation[0]);
-            normalMatrix = m4.yRotate(normalMatrix, canvasState.rotation[1]);
-            normalMatrix = m4.zRotate(normalMatrix, canvasState.rotation[2]);
-
-            gl.uniformMatrix4fv(uniformNormalMatrix, false, normalMatrix);
-        } else {
-            gl.disableVertexAttribArray(normalLocation)
-        }
         
+        var centerPoint = getBoundingBoxCenter(canvasState.model.vertices);
         
         var projectionMatrix = m4.identity();
 
@@ -354,10 +331,11 @@ function main() {
         
         var viewMatrix = m4.inverse(cameraMatrix);
         // Compute the matrices
-        
+        viewMatrix = m4.translate(viewMatrix, centerPoint[0], centerPoint[1], centerPoint[2])
         viewMatrix = m4.xRotate(viewMatrix, canvasState.rotation[0]);
         viewMatrix = m4.yRotate(viewMatrix, canvasState.rotation[1]);
         viewMatrix = m4.zRotate(viewMatrix, canvasState.rotation[2]);
+        viewMatrix = m4.translate(viewMatrix, -centerPoint[0], -centerPoint[1], -centerPoint[2])
 
         var modelMatrix = m4.identity();
         modelMatrix = m4.translate(
@@ -369,6 +347,41 @@ function main() {
         
         modelMatrix = m4.scale(modelMatrix, canvasState.scale[0], canvasState.scale[1], canvasState.scale[2]);
         var modelViewMatrix = m4.multiply(viewMatrix, modelMatrix);
+        modelViewMatrix = m4.translate(modelViewMatrix, centerPoint[0], centerPoint[1], centerPoint[2])
+        modelViewMatrix = m4.xRotate(modelViewMatrix, cubeRotation * 0.3)
+        modelViewMatrix = m4.yRotate(modelViewMatrix, cubeRotation * 0.7)
+        modelViewMatrix = m4.zRotate(modelViewMatrix, cubeRotation)
+        modelViewMatrix = m4.translate(modelViewMatrix, -centerPoint[0], -centerPoint[1], -centerPoint[2])
+
+        if (canvasState.shading) {
+            // NORMALS
+            gl.enableVertexAttribArray(normalLocation);
+
+            // Bind the position buffer.
+            gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+
+            // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+            var size = 3;
+            var type = gl.FLOAT; 
+            var normalize = false; 
+            var stride = 0; 
+            var offset = 0; 
+            gl.vertexAttribPointer(
+                normalLocation,
+                size,
+                type,
+                normalize,
+                stride,
+                offset
+            );
+            
+            var normalMatrix = m4.inverse(modelViewMatrix)
+            normalMatrix = m4.transpose(normalMatrix)
+
+            gl.uniformMatrix4fv(uniformNormalMatrix, false, normalMatrix);
+        } else {
+            gl.disableVertexAttribArray(normalLocation)
+        }
 
         gl.uniformMatrix4fv(matrixLocation, false, projectionMatrix);
         gl.uniformMatrix4fv(modelViewMatrixLocation, false, modelViewMatrix);
@@ -376,7 +389,7 @@ function main() {
         // Draw the geometry.
         var primitiveType = gl.TRIANGLES;
         var offset = 0;
-        var count = 16 * 6;
+        var count = canvasState.model.vertices.length / 3;
         gl.drawArrays(primitiveType, offset, count);
     }
 
@@ -386,6 +399,7 @@ function main() {
         console.log("SWITCHED TO OBJ_1");
         canvasState.model.vertices = F_obj.vertices;
         canvasState.model.colors = F_obj.colors;
+        canvasState.model.normals = F_obj.normals;
         // reset_canvas(F_obj, canvasState.projectionStyle);
         // update the vertices data
         positionBuffer = gl.createBuffer();
@@ -395,6 +409,11 @@ function main() {
         colorBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         setColors(gl, canvasState.model.colors);
+        // update the normals data
+        var normalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+        setNormals(gl, canvasState.model.normals);
+
         drawScene();
     });
     var obj_2 = document.querySelector('#obj_2');
@@ -411,6 +430,11 @@ function main() {
         colorBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         setColors(gl, canvasState.model.colors);
+        // update the normals data
+        var normalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+        setNormals(gl, canvasState.model.normals);
+        
         drawScene();
     });
     var obj_3 = document.querySelector('#obj_3');
@@ -425,6 +449,7 @@ function main() {
             model: {
                 vertices: object.vertices,
                 colors: object.colors,
+                normals: object.normals,
             },
             translation         : [0, 0, 0],
             rotation            : [0, 0, 0],
@@ -463,6 +488,20 @@ function main() {
         console.log("LOAD FILE MODEL");
 
     });
+
+    var then = 0
+
+    function render(now) {
+        now *= 0.001; // convert to seconds
+        deltaTime = now - then;
+        then = now;
+
+        drawScene();
+        cubeRotation += deltaTime;
+
+        requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render)
 }
 
 main();
