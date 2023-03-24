@@ -31,6 +31,7 @@ function main() {
     var shadingConditionLocation = gl.getUniformLocation(program, "u_shading_condition");
 
     // init canvas state
+    var loadedState;
     var canvasState;
     reset_canvas();
     
@@ -88,24 +89,24 @@ function main() {
     drawScene();
 
     function updatePosition(index, value) {
-        canvasState.translation[index] = value;
+        canvasState.translation[index] = parseFloat(value);
     }
 
     function updateRotation(index, value) {
       const angleInRadians = (value * Math.PI) / 180;
-        canvasState.rotation[index] = angleInRadians;
+        canvasState.rotation[index] = parseFloat(angleInRadians);
     }
 
     function updateScale(index, value) {
-        canvasState.scale[index] = value;
+        canvasState.scale[index] = parseFloat(value);
     }
 
     function updateRadius(index, value) {
-        canvasState.radius = value;
+        canvasState.radius = parseFloat(value);
     }
 
     function updateCameraAngle(index, value) {
-        canvasState.cameraAngleRadians = degToRad(value);
+        canvasState.cameraAngleRadians = parseFloat(degToRad(value));
     }
     // Get all the slider input elements
     const sliders = document.querySelectorAll('.slider-controls');
@@ -330,7 +331,7 @@ function main() {
             projectionMatrix = m4.translate(projectionMatrix, -200, 0, 0.5)
             projectionMatrix = m4.xRotate(projectionMatrix, degToRad(180))
         }
-        console.log(projectionMatrix)
+        // console.log(projectionMatrix)
         
         var cameraMatrix = m4.yRotation(canvasState.cameraAngleRadians);
         cameraMatrix = m4.translate(cameraMatrix, 0, 0, canvasState.radius * 1.5);
@@ -352,7 +353,7 @@ function main() {
         viewMatrix = m4.xRotate(viewMatrix, canvasState.rotation[0]);
         viewMatrix = m4.yRotate(viewMatrix, canvasState.rotation[1]);
         viewMatrix = m4.zRotate(viewMatrix, canvasState.rotation[2]);
-        viewMatrix = m4.translate(viewMatrix, -centerPoint[0], -centerPoint[1], -centerPoint[2])
+        viewMatrix = m4.translate(viewMatrix, -centerPoint[0], -centerPoint[1], -centerPoint[2]);
 
         var modelMatrix = m4.identity();
         modelMatrix = m4.translate(
@@ -445,19 +446,20 @@ function main() {
                 colors: object.colors,
                 normals: object.normals,
             },
-            translation         : [0, 0, 0],
-            rotation            : [0, 0, 0],
-            scale               : [1, 1, 1],
-            radius              : 200,
-            fieldOfViewRadians  : degToRad(80),
-            cameraAngleRadians  : degToRad(0),
-            projectionStyle     : projectionStyle,
-            shading             : false,
+            translation         : loadedState ? [...loadedState.translation]   : [0, 0, 0],
+            rotation            : loadedState ? [...loadedState.rotation]      : [0, 0, 0],
+            scale               : loadedState ? [...loadedState.scale]         : [1, 1, 1],
+            radius              : loadedState ? loadedState.radius             : 200,
+            fieldOfViewRadians  : loadedState ? loadedState.fieldOfViewRadians : degToRad(80),
+            cameraAngleRadians  : loadedState ? loadedState.cameraAngleRadians : degToRad(0),
+            projectionStyle     : loadedState ? loadedState.projectionStyle    : projectionStyle,
+            shading             : loadedState ? loadedState.shading            : false,
         };
-    }
+    };
     var reset_view_btn = document.querySelector('#reset_view_btn');
     reset_view_btn.addEventListener('click', () => {
         console.log("RESET VIEW MODEL");
+        console.log(loadedState);
         console.log("--before");
         console.log(canvasState);
 
@@ -483,8 +485,9 @@ function main() {
         const file_input = load_btn.files[0];
         load_state(file_input)
             .then(result => {
-                const loaded_state = JSON.parse(result);
-                canvasState = loaded_state;
+                loadedState = JSON.parse(result);
+                canvasState = {...JSON.parse(result)};
+                console.log(loadedState);
                 updateCanvasObject();
             })
             .catch(error => {
