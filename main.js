@@ -58,6 +58,12 @@ function main() {
         setNormals(gl, canvasState.model.normals);
     }
 
+    var indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    if(canvasState) {
+        setIndices(gl, canvasState.model.indices);
+    }
+
     // function to update canvas object (rewrite buffer data)
     function updateCanvasObject() {
         // update the vertices data
@@ -69,9 +75,15 @@ function main() {
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         setColors(gl, canvasState.model.colors);
         // update the normals data
-        var normalBuffer = gl.createBuffer();
+        normalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
         setNormals(gl, canvasState.model.normals);
+        
+        indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        setIndices(gl, canvasState.model.indices);
+
+
         drawScene();
     };
 
@@ -250,7 +262,7 @@ function main() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         // Cull the backface
-        gl.enable(gl.CULL_FACE);
+        //gl.enable(gl.CULL_FACE);
 
         // Enable the depth buffer
         gl.enable(gl.DEPTH_TEST);
@@ -364,7 +376,7 @@ function main() {
         );
         
         modelMatrix = m4.scale(modelMatrix, canvasState.scale[0], canvasState.scale[1], canvasState.scale[2]);
-        var modelViewMatrix = m4.multiply(viewMatrix, modelMatrix);
+        var modelViewMatrix = m4.multiply(modelMatrix, viewMatrix);
         modelViewMatrix = m4.translate(modelViewMatrix, centerPoint[0], centerPoint[1], centerPoint[2])
         modelViewMatrix = m4.xRotate(modelViewMatrix, cubeRotation * 0.3)
         modelViewMatrix = m4.yRotate(modelViewMatrix, cubeRotation * 0.7)
@@ -407,44 +419,64 @@ function main() {
         // Draw the geometry.
         var primitiveType = gl.TRIANGLES;
         var offset = 0;
-        var count = canvasState.model.vertices.length / 3;
-        gl.drawArrays(primitiveType, offset, count);
+        var count = canvasState.model.vertices.length/2;
+        var realCount = canvasState.model.vertices.length/3;
+        
+        if (canvasState.model.indices.length > 0) {
+            gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, offset);
+        } else {
+            gl.drawArrays(primitiveType, offset, realCount);
+        }
     }
 
     // OBJECT CHOICES
     var obj_1 = document.querySelector('#obj_1');
     obj_1.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_1");
-        canvasState.model.vertices = F_obj.vertices;
-        canvasState.model.colors = F_obj.colors;
-        canvasState.model.normals = F_obj.normals;
+        canvasState.model.vertices = jasonObj.vertices;
+        canvasState.model.colors = jasonObj.colors;
+        canvasState.model.normals = jasonObj.normals;
+        canvasState.model.indices = jasonObj.indices;
         // reset_canvas(F_obj, canvasState.projectionStyle);
         updateCanvasObject();
     });
     var obj_2 = document.querySelector('#obj_2');
     obj_2.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_2");
-        canvasState.model.vertices = hollowObject.vertices;
-        canvasState.model.colors = hollowObject.colors;
+        canvasState.model.vertices = F_obj.vertices;
+        canvasState.model.colors = F_obj.colors;
+        canvasState.model.normals = F_obj.normals;
+        canvasState.model.indices = F_obj.indices;
+        
         // reset_canvas(hollowObject, canvasState.projectionStyle);
         updateCanvasObject();
     });
     var obj_3 = document.querySelector('#obj_3');
     obj_3.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_3");
-        canvasState.model.vertices = cylindric_obj.vertices;
-        canvasState.model.colors = cylindric_obj.colors;
-        // reset_canvas(cylindric_obj, canvasState.projectionStyle);
+        canvasState.model.vertices = simpleObject.vertices;
+        var colors = [];
+        for (var i = 0; i < simpleObject.colors.length; i++) {
+            const color = simpleObject.colors[i];
+
+            colors = colors.concat(color,color,color,color);
+        }
+        canvasState.model.colors = colors;
+        console.log(colors);
+        canvasState.model.indices = simpleObject.indices;
+        // reset_canvas(hollowObject, canvasState.projectionStyle);
         updateCanvasObject();
     });
 
     // reset view model button operation
-    function reset_canvas(object = F_obj, projectionStyle = 1) {
+    function reset_canvas(object = simpleObject, projectionStyle = 1) {
+        console.log(object)
         canvasState = {
             model: {
                 vertices: object.vertices,
                 colors: object.colors,
                 normals: object.normals,
+                indices : object.indices,
             },
             translation         : loadedState ? [...loadedState.translation]   : [0, 0, 0],
             rotation            : loadedState ? [...loadedState.rotation]      : [0, 0, 0],
@@ -486,8 +518,7 @@ function main() {
         load_state(file_input)
             .then(result => {
                 loadedState = JSON.parse(result);
-                canvasState = {...JSON.parse(result)};
-                console.log(loadedState);
+                canvasState.model = {...JSON.parse(result)};
                 updateCanvasObject();
             })
             .catch(error => {
