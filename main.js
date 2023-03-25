@@ -518,7 +518,11 @@ function main() {
         load_state(file_input)
             .then(result => {
                 loadedState = JSON.parse(result);
-                canvasState.model = {...JSON.parse(result)};
+                if (loadedState.model) {
+                    canvasState = {...loadedState}
+                } else {
+                    canvasState.model = {...loadedState};
+                }
                 updateCanvasObject();
             })
             .catch(error => {
