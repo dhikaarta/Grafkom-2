@@ -377,11 +377,11 @@ function main() {
         
         modelMatrix = m4.scale(modelMatrix, canvasState.scale[0], canvasState.scale[1], canvasState.scale[2]);
         var modelViewMatrix = m4.multiply(modelMatrix, viewMatrix);
-        modelViewMatrix = m4.translate(modelViewMatrix, centerPoint[0], centerPoint[1], centerPoint[2])
-        modelViewMatrix = m4.xRotate(modelViewMatrix, cubeRotation * 0.3)
-        modelViewMatrix = m4.yRotate(modelViewMatrix, cubeRotation * 0.7)
-        modelViewMatrix = m4.zRotate(modelViewMatrix, cubeRotation)
-        modelViewMatrix = m4.translate(modelViewMatrix, -centerPoint[0], -centerPoint[1], -centerPoint[2])
+        // modelViewMatrix = m4.translate(modelViewMatrix, centerPoint[0], centerPoint[1], centerPoint[2])
+        // modelViewMatrix = m4.xRotate(modelViewMatrix, cubeRotation * 0.3)
+        // modelViewMatrix = m4.yRotate(modelViewMatrix, cubeRotation * 0.7)
+        // modelViewMatrix = m4.zRotate(modelViewMatrix, cubeRotation)
+        // modelViewMatrix = m4.translate(modelViewMatrix, -centerPoint[0], -centerPoint[1], -centerPoint[2])
 
         if (canvasState.shading) {
             // NORMALS
