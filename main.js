@@ -262,7 +262,7 @@ function main() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         // Cull the backface
-        gl.enable(gl.CULL_FACE);
+        //gl.enable(gl.CULL_FACE);
 
         // Enable the depth buffer
         gl.enable(gl.DEPTH_TEST);
@@ -420,11 +420,12 @@ function main() {
         var primitiveType = gl.TRIANGLES;
         var offset = 0;
         var count = canvasState.model.vertices.length/2;
+        var realCount = canvasState.model.vertices.length/3;
         
         if (canvasState.model.indices.length > 0) {
             gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, offset);
         } else {
-            gl.drawArrays(primitiveType, offset, count);
+            gl.drawArrays(primitiveType, offset, realCount);
         }
     }
 
