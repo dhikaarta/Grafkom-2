@@ -17,7 +17,7 @@ function setNormals(gl, normals) {
 function setColors(gl, colors) {
   gl.bufferData(
     gl.ARRAY_BUFFER,
-    new Float32Array(colors),
+    new Uint8Array(colors),
     gl.STATIC_DRAW
   )
 }
@@ -25,7 +25,7 @@ function setColors(gl, colors) {
 function setColors2(gl, colors) {
   gl.bufferData(
     gl.ARRAY_BUFFER,
-    new Float32Array(colors),
+    new Uint8Array(colors),
     gl.STATIC_DRAW
   )
 }

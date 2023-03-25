@@ -48,7 +48,7 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     // setColor(gl);
     if(canvasState) {
-        setColors2(gl, canvasState.model.colors);
+        setColors(gl, canvasState.model.colors);
     }
 
     // Create a buffer for normalization
@@ -299,8 +299,8 @@ function main() {
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 
         // Tell the attribute how to get data out of colorBuffer (ARRAY_BUFFER)
-        var size = 4;
-        var type = gl.FLOAT;
+        var size = 3;
+        var type = gl.UNSIGNED_BYTE;
         var normalize = true;
         var stride = 0;
         var offset = 0;
@@ -421,25 +421,31 @@ function main() {
         var offset = 0;
         var count = canvasState.model.vertices.length/2;
         
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, offset);
+        if (canvasState.model.indices.length > 0) {
+            gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, offset);
+        } else {
+            gl.drawArrays(primitiveType, offset, count);
+        }
     }
 
     // OBJECT CHOICES
     var obj_1 = document.querySelector('#obj_1');
     obj_1.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_1");
-        canvasState.model.vertices = F_obj.vertices;
-        canvasState.model.colors = F_obj.colors;
-        canvasState.model.normals = F_obj.normals;
+        canvasState.model.vertices = jasonObj.vertices;
+        canvasState.model.colors = jasonObj.colors;
+        canvasState.model.normals = jasonObj.normals;
+        canvasState.model.indices = jasonObj.indices;
         // reset_canvas(F_obj, canvasState.projectionStyle);
         updateCanvasObject();
     });
     var obj_2 = document.querySelector('#obj_2');
     obj_2.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_2");
-        canvasState.model.vertices = hollowObject.vertices;
-        canvasState.model.colors = hollowObject.colors;
-        canvasState.model.normals = hollowObject.normals;
+        canvasState.model.vertices = F_obj.vertices;
+        canvasState.model.colors = F_obj.colors;
+        canvasState.model.normals = F_obj.normals;
+        canvasState.model.indices = F_obj.indices;
         
         // reset_canvas(hollowObject, canvasState.projectionStyle);
         updateCanvasObject();
@@ -463,6 +469,7 @@ function main() {
 
     // reset view model button operation
     function reset_canvas(object = simpleObject, projectionStyle = 1) {
+        console.log(object)
         canvasState = {
             model: {
                 vertices: object.vertices,
