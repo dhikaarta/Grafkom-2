@@ -448,8 +448,8 @@ function main() {
         console.log("SWITCHED TO OBJ_2");
         canvasState.model.vertices = cylindric_obj.vertices;
         canvasState.model.colors = cylindric_obj.colors;
-        // canvasState.model.normals = cylindric_obj.normals;
-        // canvasState.model.indices = cylindric_obj.indices;
+        canvasState.model.normals = cylindric_obj.normals;
+        canvasState.model.indices = cylindric_obj.indices;
         updateCanvasObject();
     });
     var obj_3 = document.querySelector('#obj_3');
