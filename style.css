@@ -33,7 +33,8 @@ button {
   display: inline-block;
 }
 
-.shading-button {
+.shading-button,
+.animation-button {
   margin-top: 5px;
   display: flex;
   gap: 10px;

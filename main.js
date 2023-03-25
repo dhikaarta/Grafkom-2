@@ -18,6 +18,7 @@ function main() {
     // animation
     var cubeRotation = 0.0;
     var deltaTime = 0
+    var isAnimating = false
 
     // look up where the vertex data needs to go.
     var positionLocation = gl.getAttribLocation(program, "a_position");
@@ -87,17 +88,6 @@ function main() {
         drawScene();
     };
 
-    // var translation = [-200, -200, 0];
-    // var rotation = [0, 0, 0];
-    // var scale = [1, 1, 1];
-    // var radius = 200;
-    // var fieldOfViewRadians = degToRad(80);
-    // var cameraAngleRadians = degToRad(0);
-    // var projectionStyle = 1;
-    // var shading = false;
-
-    // Get the center point of the cube
-
     drawScene();
 
     function updatePosition(index, value) {
@@ -140,6 +130,21 @@ function main() {
             gl.uniform1f(shadingConditionLocation, 0.0);
         }
         drawScene()
+    })
+
+    // Get animation button
+    const toggleAnimation = document.getElementById('animation')
+
+    toggleAnimation.addEventListener('click', () => {
+        if (isAnimating) {
+            isAnimating = false
+            toggleAnimation.innerText = "Animation Off"
+            requestAnimationFrame(render)
+        } else {
+            isAnimating = true
+            toggleAnimation.innerText = "Animation On"
+            requestAnimationFrame(render)
+        }
     })
 
     const sliderMap = {
@@ -377,11 +382,11 @@ function main() {
         
         modelMatrix = m4.scale(modelMatrix, canvasState.scale[0], canvasState.scale[1], canvasState.scale[2]);
         var modelViewMatrix = m4.multiply(modelMatrix, viewMatrix);
-        // modelViewMatrix = m4.translate(modelViewMatrix, centerPoint[0], centerPoint[1], centerPoint[2])
-        // modelViewMatrix = m4.xRotate(modelViewMatrix, cubeRotation * 0.3)
-        // modelViewMatrix = m4.yRotate(modelViewMatrix, cubeRotation * 0.7)
-        // modelViewMatrix = m4.zRotate(modelViewMatrix, cubeRotation)
-        // modelViewMatrix = m4.translate(modelViewMatrix, -centerPoint[0], -centerPoint[1], -centerPoint[2])
+        modelViewMatrix = m4.translate(modelViewMatrix, centerPoint[0], centerPoint[1], centerPoint[2])
+        modelViewMatrix = m4.xRotate(modelViewMatrix, cubeRotation * 0.3)
+        modelViewMatrix = m4.yRotate(modelViewMatrix, cubeRotation * 0.7)
+        modelViewMatrix = m4.zRotate(modelViewMatrix, cubeRotation)
+        modelViewMatrix = m4.translate(modelViewMatrix, -centerPoint[0], -centerPoint[1], -centerPoint[2])
 
         if (canvasState.shading) {
             // NORMALS
@@ -537,12 +542,13 @@ function main() {
         deltaTime = now - then;
         then = now;
 
-        drawScene();
-        cubeRotation += deltaTime;
+        if (isAnimating) {
+            drawScene();
+            cubeRotation += deltaTime;
+        } 
 
         requestAnimationFrame(render);
     }
-    requestAnimationFrame(render)
 }
 
 main();
