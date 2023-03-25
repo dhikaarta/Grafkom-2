@@ -139,12 +139,11 @@ function main() {
         if (isAnimating) {
             isAnimating = false
             toggleAnimation.innerText = "Animation Off"
-            requestAnimationFrame(render)
         } else {
             isAnimating = true
             toggleAnimation.innerText = "Animation On"
-            requestAnimationFrame(render)
         }
+        requestAnimationFrame(render)
     })
 
     const sliderMap = {
