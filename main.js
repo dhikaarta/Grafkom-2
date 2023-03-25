@@ -441,7 +441,6 @@ function main() {
         canvasState.model.colors = jasonObj.colors;
         canvasState.model.normals = jasonObj.normals;
         canvasState.model.indices = jasonObj.indices;
-        // reset_canvas(F_obj, canvasState.projectionStyle);
         updateCanvasObject();
     });
     var obj_2 = document.querySelector('#obj_2');
@@ -451,7 +450,6 @@ function main() {
         canvasState.model.colors = cylindric_obj.colors;
         // canvasState.model.normals = cylindric_obj.normals;
         // canvasState.model.indices = cylindric_obj.indices;
-        // reset_canvas(cylindric_obj, canvasState.projectionStyle);
         updateCanvasObject();
     });
     var obj_3 = document.querySelector('#obj_3');
@@ -467,7 +465,6 @@ function main() {
         canvasState.model.colors = colors;
         console.log(colors);
         canvasState.model.indices = simpleObject.indices;
-        // reset_canvas(hollowObject, canvasState.projectionStyle);
         updateCanvasObject();
     });
 

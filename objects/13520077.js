@@ -1,6 +1,8 @@
 var cylindric_obj = {
     vertices: [],
     colors: [],
+    indices: [],
+    normals: [],
 };
   
   const numSlices = 16;
