@@ -448,12 +448,11 @@ function main() {
     var obj_2 = document.querySelector('#obj_2');
     obj_2.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_2");
-        canvasState.model.vertices = F_obj.vertices;
-        canvasState.model.colors = F_obj.colors;
-        canvasState.model.normals = F_obj.normals;
-        canvasState.model.indices = F_obj.indices;
-        
-        // reset_canvas(hollowObject, canvasState.projectionStyle);
+        canvasState.model.vertices = cylindric_obj.vertices;
+        canvasState.model.colors = cylindric_obj.colors;
+        // canvasState.model.normals = cylindric_obj.normals;
+        // canvasState.model.indices = cylindric_obj.indices;
+        // reset_canvas(cylindric_obj, canvasState.projectionStyle);
         updateCanvasObject();
     });
     var obj_3 = document.querySelector('#obj_3');
