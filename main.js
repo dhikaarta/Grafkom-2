@@ -48,7 +48,7 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     // setColor(gl);
     if(canvasState) {
-        setColors(gl, canvasState.model.colors);
+        setColors2(gl, canvasState.model.colors);
     }
 
     // Create a buffer for normalization
@@ -56,6 +56,12 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
     if(canvasState) {
         setNormals(gl, canvasState.model.normals);
+    }
+
+    var indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    if(canvasState) {
+        setIndices(gl, canvasState.model.indices);
     }
 
     // function to update canvas object (rewrite buffer data)
@@ -72,7 +78,12 @@ function main() {
         normalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
         setNormals(gl, canvasState.model.normals);
-        console.log(canvasState.model.normals);
+        
+        indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        setIndices(gl, canvasState.model.indices);
+
+
         drawScene();
     };
 
@@ -288,8 +299,8 @@ function main() {
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 
         // Tell the attribute how to get data out of colorBuffer (ARRAY_BUFFER)
-        var size = 3;
-        var type = gl.UNSIGNED_BYTE;
+        var size = 4;
+        var type = gl.FLOAT;
         var normalize = true;
         var stride = 0;
         var offset = 0;
@@ -408,8 +419,9 @@ function main() {
         // Draw the geometry.
         var primitiveType = gl.TRIANGLES;
         var offset = 0;
-        var count = canvasState.model.vertices.length / 3;
-        gl.drawArrays(primitiveType, offset, count);
+        var count = canvasState.model.vertices.length/2;
+        
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, offset);
     }
 
     // OBJECT CHOICES
@@ -435,19 +447,28 @@ function main() {
     var obj_3 = document.querySelector('#obj_3');
     obj_3.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_3");
-        canvasState.model.vertices = hollowPrism.vertices;
-        canvasState.model.colors = hollowPrism.colors;
+        canvasState.model.vertices = simpleObject.vertices;
+        var colors = [];
+        for (var i = 0; i < simpleObject.colors.length; i++) {
+            const color = simpleObject.colors[i];
+
+            colors = colors.concat(color,color,color,color);
+        }
+        canvasState.model.colors = colors;
+        console.log(colors);
+        canvasState.model.indices = simpleObject.indices;
         // reset_canvas(hollowObject, canvasState.projectionStyle);
         updateCanvasObject();
     });
 
     // reset view model button operation
-    function reset_canvas(object = F_obj, projectionStyle = 1) {
+    function reset_canvas(object = simpleObject, projectionStyle = 1) {
         canvasState = {
             model: {
                 vertices: object.vertices,
                 colors: object.colors,
                 normals: object.normals,
+                indices : object.indices,
             },
             translation         : loadedState ? [...loadedState.translation]   : [0, 0, 0],
             rotation            : loadedState ? [...loadedState.rotation]      : [0, 0, 0],
