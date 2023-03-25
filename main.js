@@ -432,9 +432,9 @@ function main() {
     var obj_3 = document.querySelector('#obj_3');
     obj_3.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_3");
-        canvasState.model.vertices = hollowObject.vertices;
-        canvasState.model.colors = hollowObject.colors;
-        // reset_canvas(hollowObject, canvasState.projectionStyle);
+        canvasState.model.vertices = cylindric_obj.vertices;
+        canvasState.model.colors = cylindric_obj.colors;
+        // reset_canvas(cylindric_obj, canvasState.projectionStyle);
         updateCanvasObject();
     });
 
