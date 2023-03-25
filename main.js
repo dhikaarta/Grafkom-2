@@ -18,6 +18,7 @@ function main() {
     // animation
     var cubeRotation = 0.0;
     var deltaTime = 0
+    var isAnimating = false
 
     // look up where the vertex data needs to go.
     var positionLocation = gl.getAttribLocation(program, "a_position");
@@ -87,17 +88,6 @@ function main() {
         drawScene();
     };
 
-    // var translation = [-200, -200, 0];
-    // var rotation = [0, 0, 0];
-    // var scale = [1, 1, 1];
-    // var radius = 200;
-    // var fieldOfViewRadians = degToRad(80);
-    // var cameraAngleRadians = degToRad(0);
-    // var projectionStyle = 1;
-    // var shading = false;
-
-    // Get the center point of the cube
-
     drawScene();
 
     function updatePosition(index, value) {
@@ -140,6 +130,20 @@ function main() {
             gl.uniform1f(shadingConditionLocation, 0.0);
         }
         drawScene()
+    })
+
+    // Get animation button
+    const toggleAnimation = document.getElementById('animation')
+
+    toggleAnimation.addEventListener('click', () => {
+        if (isAnimating) {
+            isAnimating = false
+            toggleAnimation.innerText = "Animation Off"
+        } else {
+            isAnimating = true
+            toggleAnimation.innerText = "Animation On"
+        }
+        requestAnimationFrame(render)
     })
 
     const sliderMap = {
@@ -443,12 +447,11 @@ function main() {
     var obj_2 = document.querySelector('#obj_2');
     obj_2.addEventListener('click', () => {
         console.log("SWITCHED TO OBJ_2");
-        canvasState.model.vertices = F_obj.vertices;
-        canvasState.model.colors = F_obj.colors;
-        canvasState.model.normals = F_obj.normals;
-        canvasState.model.indices = F_obj.indices;
-        
-        // reset_canvas(hollowObject, canvasState.projectionStyle);
+        canvasState.model.vertices = cylindric_obj.vertices;
+        canvasState.model.colors = cylindric_obj.colors;
+        // canvasState.model.normals = cylindric_obj.normals;
+        // canvasState.model.indices = cylindric_obj.indices;
+        // reset_canvas(cylindric_obj, canvasState.projectionStyle);
         updateCanvasObject();
     });
     var obj_3 = document.querySelector('#obj_3');
@@ -532,7 +535,11 @@ function main() {
         load_state(file_input)
             .then(result => {
                 loadedState = JSON.parse(result);
-                canvasState.model = {...JSON.parse(result)};
+                if (loadedState.model) {
+                    canvasState = {...loadedState}
+                } else {
+                    canvasState.model = {...loadedState};
+                }
                 updateCanvasObject();
             })
             .catch(error => {
@@ -547,12 +554,13 @@ function main() {
         deltaTime = now - then;
         then = now;
 
-        drawScene();
-        cubeRotation += deltaTime;
+        if (isAnimating) {
+            drawScene();
+            cubeRotation += deltaTime;
+        } 
 
         requestAnimationFrame(render);
     }
-    requestAnimationFrame(render)
 }
 
 main();
