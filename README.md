@@ -14,7 +14,7 @@ Pada tugas besar kali ini dilakukan implementasi pembuatan Hollow Object menggun
 1. Lakukan clone repository ini ke komputer Anda
 2. Buka file 'index.html' di browser web pilihan yang memiliki support WebGL
 
-### Screemshot Gambar
+### Screenshot Gambar
 - Objek 1  
 
 ![image](https://user-images.githubusercontent.com/71170262/227727770-a240aed0-767f-429e-952d-82309ac5ca7a.png)
