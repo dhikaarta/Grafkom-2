@@ -419,7 +419,7 @@ function main() {
         // Draw the geometry.
         var primitiveType = gl.TRIANGLES;
         var offset = 0;
-        var count = canvasState.model.vertices.length/2;
+        var count = canvasState.model.vertices.length/3;
         
         if (canvasState.model.indices.length > 0) {
             gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, offset);
@@ -517,8 +517,7 @@ function main() {
         load_state(file_input)
             .then(result => {
                 loadedState = JSON.parse(result);
-                canvasState = {...JSON.parse(result)};
-                console.log(loadedState);
+                canvasState.model = {...JSON.parse(result)};
                 updateCanvasObject();
             })
             .catch(error => {
