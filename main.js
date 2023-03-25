@@ -465,21 +465,7 @@ function main() {
             colors = colors.concat(color,color,color,color);
         }
         canvasState.model.colors = colors;
-        const normal = new Float32Array(simpleObject.vertices.length);
-
-        for(let i = 0; i < simpleObject.indices.length; i+=3) {
-            const i1 = simpleObject.indices[i];
-            const i2 = simpleObject.indices[i+1];
-            const i3 = simpleObject.indices[i+2];
-            const v1 = simpleObject.vertices.slice(i1*3, i1*3+3);
-            const v2 = simpleObject.vertices.slice(i2*3, i2*3+3);
-            const v3 = simpleObject.vertices.slice(i3*3, i3*3+3);
-            const n = computeNormal(v1, v2, v3);
-            normal.set(n, i1*3);
-            normal.set(n, i2*3);
-            normal.set(n, i3*3);
-        }
-        canvasState.model.normals = normal;
+        canvasState.model.normals = simpleObject.normals;
         canvasState.model.indices = simpleObject.indices;
         // reset_canvas(hollowObject, canvasState.projectionStyle);
         updateCanvasObject();
